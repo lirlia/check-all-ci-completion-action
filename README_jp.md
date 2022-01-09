@@ -16,6 +16,8 @@
 
 Check All CI Completion では、すべての起動した CI が成功しているかどうかをチェックします。そのため **Check All CI Completion ジョブが成功することを強制する** ことで GitHub Auto-merge を利用しやすくします。
 
+![check-job](images/check-job.png)
+
 ## 使い方
 
 ```yaml
@@ -29,7 +31,7 @@ Check All CI Completion では、すべての起動した CI が成功してい�
     sleep-seconds: '300'
 ```
 
-### full yaml (for main branch)
+### Full yaml (for main branch)
 
 ```yaml
 name: check-all-ci-result
@@ -51,11 +53,11 @@ jobs:
 - [Setting] → [Branches] → [Branch protection rule] → [Edit] 
 - "Require status checks to pass before merging" の有効化
 - "Require branches to be up to date before merging" の有効化
-- "Status checks that are required." の設定
+- "Status checks that are required." で "check" を設定してください
 
 ## :warning:注意:warning:
 
-このジョブは他のジョブの完了を待っている間も GitHub Actions の課金対象となるため、ユースケースによっては予期しない額の課金が発生する可能性があります。
+このジョブは他のジョブの完了を待っている間は待機し続けるため GitHub Actions の課金対象になります。ユースケースによっては予期しない額の課金が発生する可能性があります。
 
 ## License
 

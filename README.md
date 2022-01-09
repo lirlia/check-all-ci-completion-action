@@ -17,7 +17,7 @@ In this case, no matter which job is required to complete, Auto-Merge cannot be 
 
 Check All CI Completion checks if all launched CIs are successful or not. This makes it easier to use GitHub Auto-merge by **forcing the Check All CI Completion job to succeed**.
 
-Translated with www.DeepL.com/Translator (free version)
+![check-job](images/check-job.png)
 
 ## Usage
 
@@ -32,7 +32,8 @@ Translated with www.DeepL.com/Translator (free version)
     sleep-seconds: '300'
 ```
 
-### full yaml (for main branch)
+### Full yaml (for main branch)
+
 ```yaml
 name: check-all-ci-result
 on:
@@ -53,11 +54,11 @@ jobs:
 - [Setting] → [Branches] → [Branch protection rule] → [Edit] 
 - enable "Require status checks to pass before merging"
 - enable "Require branches to be up to date before merging"
-- set "Status checks that are required."
+- set "check" in "Status checks that are required."
 
-## Caution
+## :warning:Caution:warning:
 
-This job will still be billed by GitHub Actions while it waits for other jobs to complete, so depending on your use case, you may be charged an unexpected amount.
+This job will be charged for GitHub Actions because it will continue to wait while waiting for other jobs to complete. Therefore, depending on your use case, you may be charged an unexpected amount.
 
 ## License
 
