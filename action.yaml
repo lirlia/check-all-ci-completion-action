@@ -1,0 +1,57 @@
+name: 'Check All CI Completion'
+description: 'wether all ci status which be related to commit are success or not'
+inputs:
+  job-idle-seconds:
+    description: 'How long run this ci'
+    required: false
+    default: '1800'
+  sleep-seconds:
+    description: 'Sleep seconds in a loop'
+    required: false
+    default: '30'
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+
+        set -x
+        GITHUB_TOKEN=${{ github.token }}
+        JOB_IDLE_SECONDS=${{ inputs.job-idle-seconds }}
+        SLEEP_SECONDS=${{ inputs.sleep-seconds }}
+
+        # get this job's check suite id, because of ignore this job
+        echo "$GITHUB_TOKEN" | gh auth login --with-token
+        CHECK_SUITE_ID=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" | jq -r '.check_suite_id')
+
+        SECONDS=0
+        # loop until ci which be related to commit completed by check check-suites status
+        while [ $SECONDS -lt $JOB_IDLE_SECONDS ]
+        do
+            # get all ci check-suites status
+            # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
+            STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
+                | jq -r ".check_suites[] \
+                | select(any(.app;.slug != \"dependabot\")) \
+                | select(.id != ${CHECK_SUITE_ID}) \
+                | .status" \
+                | sort \
+                | uniq)
+
+            # if all statuses are completed, break
+            [ "${STATUS}" = "completed" ] && break
+
+            sleep $SLEEP_SECONDS
+        done
+
+        # if all check-suites results are success or neutral, this ci is success
+        # https://docs.github.com/ja/rest/guides/getting-started-with-the-checks-api#about-check-suites
+        gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
+            | jq -r ".check_suites[] \
+                | select(any(.app;.slug != \"dependabot\")) \
+                | select(.id != ${CHECK_SUITE_ID}) \
+                | .conclusion" \
+            | sort \
+            | uniq \
+            | grep -v -E "(success|neutral)" && exit 1 || exit 0
