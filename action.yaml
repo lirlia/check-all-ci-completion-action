@@ -14,15 +14,15 @@ runs:
   using: "composite"
   steps:
     - shell: bash
+      env:
+        JOB_IDLE_SECONDS: "${{ inputs.job-idle-seconds }}"
+        SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
       run: |
 
         set -x
-        GITHUB_TOKEN=${{ github.token }}
-        JOB_IDLE_SECONDS=${{ inputs.job-idle-seconds }}
-        SLEEP_SECONDS=${{ inputs.sleep-seconds }}
 
         # get this job's check suite id, because of ignore this job
-        echo "$GITHUB_TOKEN" | gh auth login --with-token
+        echo "${{ github.token }}" | gh auth login --with-token
         CHECK_SUITE_ID=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" | jq -r '.check_suite_id')
 
         SECONDS=0
