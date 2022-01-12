@@ -26,7 +26,7 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
   with:
     # Default: 1800 seconds
     # How long maintains this CI (This job waits for another jobs completion)
-    job-idle-seconds: '1800'
+    timeout-seconds: '1800'
     # Default: 300 seconds
     # Sleep seconds between check another jobs status
     sleep-seconds: '300'
