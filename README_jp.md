@@ -25,7 +25,7 @@ Check All CI Completion では、すべての起動した CI が成功してい�
   with:
     # Default: 1800 seconds
     # このジョブを維持する秒数(このジョブは他のジョブの終了を待機します)
-    job-idle-seconds: '1800'
+    timeout-seconds: '1800'
     # Default: 300 seconds
     # 他のジョブの状態をチェックするまでの待機秒数
     sleep-seconds: '300'

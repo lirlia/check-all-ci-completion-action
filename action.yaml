@@ -1,7 +1,7 @@
 name: 'Check All CI Completion'
 description: 'wether all ci status which be related to commit are success or not'
 inputs:
-  job-idle-seconds:
+  timeout-seconds:
     description: 'How long run this ci'
     required: false
     default: '1800'
@@ -15,7 +15,7 @@ runs:
   steps:
     - shell: bash
       env:
-        JOB_IDLE_SECONDS: "${{ inputs.job-idle-seconds }}"
+        TIMEOUT_SECONDS: "${{ inputs.timeout-seconds }}"
         SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
       run: |
 
@@ -27,7 +27,7 @@ runs:
 
         SECONDS=0
         # loop until ci which be related to commit completed by check check-suites status
-        while [ $SECONDS -lt $JOB_IDLE_SECONDS ]
+        while [ $SECONDS -lt $TIMEOUT_SECONDS ]
         do
             # get all ci check-suites status
             # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
