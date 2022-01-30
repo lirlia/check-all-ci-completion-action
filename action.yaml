@@ -33,7 +33,9 @@ runs:
             # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
             STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
                 | jq -r ".check_suites[] \
+                | select(any(.app;.slug != \"codecov\")) \
                 | select(any(.app;.slug != \"dependabot\")) \
+                | select(any(.app;.slug != \"renovate\")) \
                 | select(.id != ${CHECK_SUITE_ID}) \
                 | .status" \
                 | sort \
@@ -49,7 +51,9 @@ runs:
         # https://docs.github.com/ja/rest/guides/getting-started-with-the-checks-api#about-check-suites
         gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
             | jq -r ".check_suites[] \
+                | select(any(.app;.slug != \"codecov\")) \
                 | select(any(.app;.slug != \"dependabot\")) \
+                | select(any(.app;.slug != \"renovate\")) \
                 | select(.id != ${CHECK_SUITE_ID}) \
                 | .conclusion" \
             | sort \
