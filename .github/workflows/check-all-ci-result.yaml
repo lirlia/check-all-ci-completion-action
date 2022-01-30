@@ -1,0 +1,13 @@
+name: check-all-ci-result
+on:
+  push:
+    # https://stackoverflow.com/questions/57699839/github-actions-how-to-target-all-branches-except-master
+    branches:
+      - '**'        # matches every branch
+      - '!main'     # excludes main
+jobs:
+  check-another-ci:
+    name: check
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: lirlia/check-all-ci-completion-action@${{ github.head_ref }}
