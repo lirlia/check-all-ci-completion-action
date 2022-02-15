@@ -30,7 +30,7 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
 
     # Default: 000000000000000 (dummy value)
     # ignoring check suite ids
-    ignore_check_suite_ids: '11111111,22222222'
+    ignore-check-suite-ids: '11111111,22222222'
 
     # Default: -1 (loop until timeout)
     # How many loop in this CI

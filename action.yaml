@@ -4,7 +4,7 @@ inputs:
   commit-hash:
     description: 'git commit hash to get check suites'
     required: false
-  ignore_check_suite_ids:
+  ignore-check-suite-ids:
     description: 'ignore check_suite_ids'
     required: false
     default: '000000000000000'
@@ -34,7 +34,7 @@ runs:
     - id: check-ci-statuses
       shell: bash
       env:
-        IGNORE_CHECK_SUITE_IDS: "${{ inputs.ignore_check_suite_ids }}"
+        IGNORE_CHECK_SUITE_IDS: "${{ inputs.ignore-check-suite-ids }}"
         LOOP_COUNT: "${{ inputs.loop-count }}"
         SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
         SPECIFIC_COMMIT_HASH: "${{ inputs.commit-hash }}"
