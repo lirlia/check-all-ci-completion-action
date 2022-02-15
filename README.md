@@ -24,6 +24,9 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
 ```yaml
 - uses: lirlia/check-all-ci-completion-action@v1.0.0
   with:
+    # Default: -1 (loop until timeout)
+    # How many loop in this CI
+    loop-count: '10'
     # Default: 1800 seconds
     # How long maintains this CI (This job waits for another jobs completion)
     timeout-seconds: '1800'
@@ -51,7 +54,7 @@ jobs:
 
 ### GitHub Setting
 
-- [Setting] → [Branches] → [Branch protection rule] → [Edit] 
+- [Setting] → [Branches] → [Branch protection rule] → [Edit]
 - enable "Require status checks to pass before merging"
 - enable "Require branches to be up to date before merging"
 - set "check" in "Status checks that are required."

@@ -23,6 +23,9 @@ Check All CI Completion では、すべての起動した CI が成功してい�
 ```yaml
 - uses: lirlia/check-all-ci-completion-action@v1.0.0
   with:
+    # Default: -1 (タイムアウトまでループします)
+    # ジョブ内で何回ループを行うか
+    loop-count: '10'
     # Default: 1800 seconds
     # このジョブを維持する秒数(このジョブは他のジョブの終了を待機します)
     timeout-seconds: '1800'
