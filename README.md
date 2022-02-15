@@ -24,6 +24,10 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
 ```yaml
 - uses: lirlia/check-all-ci-completion-action@latest
   with:
+    # Default: env.GITHUB_SHA
+    # commit hash to get check suites
+    commit-hash: 'put any git commit hash'
+
     # Default: 000000000000000 (dummy value)
     # ignoring check suite ids
     ignore_check_suite_ids: '11111111,22222222'
@@ -32,13 +36,13 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
     # How many loop in this CI
     loop-count: '10'
 
-    # Default: 1800 seconds
-    # How long maintains this CI (This job waits for another jobs completion)
-    timeout-seconds: '1800'
-
     # Default: 300 seconds
     # Sleep seconds between check another jobs status
     sleep-seconds: '300'
+
+    # Default: 1800 seconds
+    # How long maintains this CI (This job waits for another jobs completion)
+    timeout-seconds: '1800'
 ```
 
 ### Outputs
