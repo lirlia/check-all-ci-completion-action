@@ -1,51 +1,45 @@
 name: 'Check All CI Completion'
 description: 'wether all ci status which be related to commit are success or not'
 inputs:
-  timeout-seconds:
-    description: 'How long run this ci'
-    required: false
-    default: '1800'
-  sleep-seconds:
-    description: 'Sleep seconds in a loop'
-    required: false
-    default: '30'
+  ignore_check_suite_ids:
+    description: 'the ignore check_suite_ids for specific git commit. ex) 1111,2222'
+    required: true
+outputs:
+  result:
+    description: 'the RESULT of the specific check-suites (success or fail)'
+    value: ${{ steps.check-ci-statuses.outputs.result }}
+  status:
+    description: 'the STATUS of the specific check-suites (completed or in-progress)'
+    value: ${{ steps.check-ci-statuses.outputs.status }}
 
 runs:
   using: "composite"
   steps:
-    - shell: bash
+    - id: check-ci-statuses
+      shell: bash
       env:
-        TIMEOUT_SECONDS: "${{ inputs.timeout-seconds }}"
-        SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
+        IGNORE_CHECK_SUITE_IDS: "${{ inputs.ignore_check_suite_ids }}"
       run: |
 
         set -x
 
         # get this job's check suite id, because of ignore this job
         echo "${{ github.token }}" | gh auth login --with-token
-        CHECK_SUITE_ID=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" | jq -r '.check_suite_id')
 
-        SECONDS=0
-        # loop until ci which be related to commit completed by check check-suites status
-        while [ $SECONDS -lt $TIMEOUT_SECONDS ]
-        do
-            # get all ci check-suites status
-            # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
-            STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
-                | jq -r ".check_suites[] \
-                | select(any(.app;.slug != \"codecov\")) \
-                | select(any(.app;.slug != \"dependabot\")) \
-                | select(any(.app;.slug != \"renovate\")) \
-                | select(.id != ${CHECK_SUITE_ID}) \
-                | .status" \
-                | sort \
-                | uniq)
+        # get all ci check-suites status
+        # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
+        STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
+          | jq -r ".check_suites[] \
+          | select(any(.app;.slug != \"codecov\")) \
+          | select(any(.app;.slug != \"dependabot\")) \
+          | select(any(.app;.slug != \"renovate\")) \
+          | select([.id] | inside([${IGNORE_CHECK_SUITE_IDS:-dummy_id}]) | not ) \
+          | .status" \
+          | sort \
+          | uniq)
 
-            # if all statuses are completed, break
-            [ "${STATUS}" = "completed" ] && break
-
-            sleep $SLEEP_SECONDS
-        done
+        [[ "${STATUS}" = "completed" ]] || STATUS="in-progress"
+        echo "::set-output name=status::${STATUS}"
 
         # if all check-suites results are success or neutral, this ci is success
         # https://docs.github.com/ja/rest/guides/getting-started-with-the-checks-api#about-check-suites
@@ -54,8 +48,10 @@ runs:
                 | select(any(.app;.slug != \"codecov\")) \
                 | select(any(.app;.slug != \"dependabot\")) \
                 | select(any(.app;.slug != \"renovate\")) \
-                | select(.id != ${CHECK_SUITE_ID}) \
+                | select([.id] | inside([${IGNORE_CHECK_SUITE_IDS:-dummy_id}]) | not ) \
                 | .conclusion" \
             | sort \
             | uniq \
-            | grep -v -E "(success|neutral)" && exit 1 || exit 0
+            | grep -v -E "(success|neutral)" && RESULT="success" || RESULT="fail"
+
+        echo "::set-output name=result::${RESULT}"
