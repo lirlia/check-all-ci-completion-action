@@ -1,6 +1,10 @@
 name: 'Check All CI Completion'
 description: 'wether all ci status which be related to commit are success or not'
 inputs:
+  ignore_check_suite_ids:
+    description: 'ignore check_suite_ids'
+    required: false
+    default: '000000000000000'
   loop-count:
     description: 'How many loop in this ci'
     required: false
@@ -19,6 +23,7 @@ runs:
   steps:
     - shell: bash
       env:
+        IGNORE_CHECK_SUITE_IDS: "${{ inputs.ignore_check_suite_ids }}"
         LOOP_COUNT: "${{ inputs.loop-count }}"
         TIMEOUT_SECONDS: "${{ inputs.timeout-seconds }}"
         SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
@@ -42,6 +47,7 @@ runs:
                 | select(any(.app;.slug != \"dependabot\")) \
                 | select(any(.app;.slug != \"renovate\")) \
                 | select(.id != ${CHECK_SUITE_ID}) \
+                | select([.id] | inside([${IGNORE_CHECK_SUITE_IDS}]) | not ) \
                 | .status" \
                 | sort \
                 | uniq)
@@ -60,6 +66,7 @@ runs:
                 | select(any(.app;.slug != \"dependabot\")) \
                 | select(any(.app;.slug != \"renovate\")) \
                 | select(.id != ${CHECK_SUITE_ID}) \
+                | select([.id] | inside([${IGNORE_CHECK_SUITE_IDS}]) | not ) \
                 | .conclusion" \
             | sort \
             | uniq \
