@@ -1,6 +1,10 @@
 name: 'Check All CI Completion'
 description: 'wether all ci status which be related to commit are success or not'
 inputs:
+  loop-count:
+    description: 'How many loop in this ci'
+    required: false
+    default: '-1'
   timeout-seconds:
     description: 'How long run this ci'
     required: false
@@ -15,6 +19,7 @@ runs:
   steps:
     - shell: bash
       env:
+        LOOP_COUNT: "${{ inputs.loop-count }}"
         TIMEOUT_SECONDS: "${{ inputs.timeout-seconds }}"
         SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
       run: |
@@ -43,7 +48,7 @@ runs:
 
             # if all statuses are completed, break
             [ "${STATUS}" = "completed" ] && break
-
+            [[ $(( LOOP_COUNT-- )) -eq 0 ]] && exit 1
             sleep $SLEEP_SECONDS
         done
 
