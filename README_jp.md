@@ -23,6 +23,10 @@ Check All CI Completion では、すべての起動した CI が成功してい�
 ```yaml
 - uses: lirlia/check-all-ci-completion-action@v1.0.0
   with:
+    # Default: env.GITHUB_SHA
+    # check suites を取得するためのコミットハッシュ
+    commit-hash: 'put any git commit hash'
+
     # Default: 000000000000000 (dummy value)
     # 無視する check suite id を指定(複数の場合は,で区切る)
     ignore_check_suite_ids: '11111111,22222222'
@@ -31,13 +35,13 @@ Check All CI Completion では、すべての起動した CI が成功してい�
     # ジョブ内で何回ループを行うか
     loop-count: '10'
 
-    # Default: 1800 seconds
-    # このジョブを維持する秒数(このジョブは他のジョブの終了を待機します)
-    timeout-seconds: '1800'
-
     # Default: 300 seconds
     # 他のジョブの状態をチェックするまでの待機秒数
     sleep-seconds: '300'
+
+    # Default: 1800 seconds
+    # このジョブを維持する秒数(このジョブは他のジョブの終了を待機します)
+    timeout-seconds: '1800'
 ```
 
 ### Outputs
@@ -45,7 +49,7 @@ Check All CI Completion では、すべての起動した CI が成功してい�
 | name   | value                    | description                                                                            |
 | ------ | ------------------------ | -------------------------------------------------------------------------------------- |
 | result | success / fail           | 別の CI ジョブの結果（すべてのジョブが success または neutralの場合、結果は success です |
-| status | completed / in-ptrogress | 別の CI ジョブのステータスです                                                           |
+| status | completed / in-progress | 別の CI ジョブのステータスです                                                           |
 
 ### Full yaml (for main branch)
 

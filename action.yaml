@@ -1,6 +1,9 @@
 name: 'Check All CI Completion'
 description: 'wether all ci status which be related to commit are success or not'
 inputs:
+  commit-hash:
+    description: 'git commit hash to get check suites'
+    required: false
   ignore_check_suite_ids:
     description: 'ignore check_suite_ids'
     required: false
@@ -33,11 +36,15 @@ runs:
       env:
         IGNORE_CHECK_SUITE_IDS: "${{ inputs.ignore_check_suite_ids }}"
         LOOP_COUNT: "${{ inputs.loop-count }}"
-        TIMEOUT_SECONDS: "${{ inputs.timeout-seconds }}"
         SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
+        SPECIFIC_COMMIT_HASH: "${{ inputs.commit-hash }}"
+        TIMEOUT_SECONDS: "${{ inputs.timeout-seconds }}"
       run: |
 
         set -x
+
+        # use specific commit hash
+        [[ $SPECIFIC_COMMIT_HASH ]] || SPECIFIC_COMMIT_HASH="$GITHUB_SHA"
 
         # get this job's check suite id, because of ignore this job
         echo "${{ github.token }}" | gh auth login --with-token
@@ -49,7 +56,7 @@ runs:
         do
             # get all ci check-suites status
             # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
-            STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
+            STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${SPECIFIC_COMMIT_HASH}/check-suites" \
                 | jq -r ".check_suites[] \
                 | select(any(.app;.slug != \"codecov\")) \
                 | select(any(.app;.slug != \"dependabot\")) \
@@ -68,7 +75,7 @@ runs:
 
         # if all check-suites results are success or neutral, this ci is success
         # https://docs.github.com/ja/rest/guides/getting-started-with-the-checks-api#about-check-suites
-        gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-suites" \
+        gh api "repos/${GITHUB_REPOSITORY}/commits/${SPECIFIC_COMMIT_HASH}/check-suites" \
             | jq -r ".check_suites[] \
                 | select(any(.app;.slug != \"codecov\")) \
                 | select(any(.app;.slug != \"dependabot\")) \
