@@ -23,12 +23,18 @@ Check All CI Completion では、すべての起動した CI が成功してい�
 ```yaml
 - uses: lirlia/check-all-ci-completion-action@v1.0.0
   with:
+    # Default: 000000000000000 (dummy value)
+    # 無視する check suite id を指定(複数の場合は,で区切る)
+    ignore_check_suite_ids: '11111111,22222222'
+
     # Default: -1 (タイムアウトまでループします)
     # ジョブ内で何回ループを行うか
     loop-count: '10'
+
     # Default: 1800 seconds
     # このジョブを維持する秒数(このジョブは他のジョブの終了を待機します)
     timeout-seconds: '1800'
+
     # Default: 300 seconds
     # 他のジョブの状態をチェックするまでの待機秒数
     sleep-seconds: '300'
@@ -48,12 +54,12 @@ jobs:
     name: check
     runs-on: ubuntu-20.04
     steps:
-      - uses: lirlia/check-all-ci-completion-action@v1.0.0
+      - uses: lirlia/check-all-ci-completion-action@latest
 ```
 
 ### GitHub 設定
 
-- [Setting] → [Branches] → [Branch protection rule] → [Edit] 
+- [Setting] → [Branches] → [Branch protection rule] → [Edit]
 - "Require status checks to pass before merging" の有効化
 - "Require branches to be up to date before merging" の有効化
 - "Status checks that are required." で "check" を設定してください
