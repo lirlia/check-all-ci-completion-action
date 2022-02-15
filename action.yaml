@@ -17,11 +17,19 @@ inputs:
     description: 'Sleep seconds in a loop'
     required: false
     default: '30'
+outputs:
+  result:
+    description: 'the RESULT of the specific check-suites (success or fail)'
+    value: ${{ steps.check-ci-statuses.outputs.result }}
+  status:
+    description: 'the STATUS of the specific check-suites (completed or in-progress)'
+    value: ${{ steps.check-ci-statuses.outputs.status }}
 
 runs:
   using: "composite"
   steps:
-    - shell: bash
+    - id: check-ci-statuses
+      shell: bash
       env:
         IGNORE_CHECK_SUITE_IDS: "${{ inputs.ignore_check_suite_ids }}"
         LOOP_COUNT: "${{ inputs.loop-count }}"
@@ -70,4 +78,11 @@ runs:
                 | .conclusion" \
             | sort \
             | uniq \
-            | grep -v -E "(success|neutral)" && exit 1 || exit 0
+            | grep -v -E "(success|neutral)" && RESULT="fail" || RESULT="success"
+
+        # output
+        [[ "${STATUS}" = "completed" ]] || STATUS="in-progress"
+        echo "::set-output name=status::${STATUS}"
+        echo "::set-output name=result::${RESULT}"
+
+        [[ "${RESULT}" = "success" ]] && exit 0 || exit 1

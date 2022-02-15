@@ -40,6 +40,13 @@ Check All CI Completion では、すべての起動した CI が成功してい�
     sleep-seconds: '300'
 ```
 
+### Outputs
+
+| name   | value                    | description                                                                            |
+| ------ | ------------------------ | -------------------------------------------------------------------------------------- |
+| result | success / fail           | 別の CI ジョブの結果（すべてのジョブが success または neutralの場合、結果は success です |
+| status | completed / in-ptrogress | 別の CI ジョブのステータスです                                                           |
+
 ### Full yaml (for main branch)
 
 ```yaml

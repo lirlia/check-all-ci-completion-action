@@ -41,6 +41,13 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
     sleep-seconds: '300'
 ```
 
+### Outputs
+
+| name   | value                    | description                                                                  |
+| ------ | ------------------------ | ---------------------------------------------------------------------------- |
+| result | success / fail           | another CI job result(if all jobs are success or neutral, result is success) |
+| status | completed / in-progress | another CI job status                                                        |
+
 ### Full yaml (for main branch)
 
 ```yaml
