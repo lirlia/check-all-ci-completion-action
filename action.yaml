@@ -5,7 +5,7 @@ inputs:
     description: 'git commit hash to get check suites'
     required: false
   disable-errexit:
-    description: 'if false, use exit 0 whether CI results are not completed or not success'
+    description: 'if true, use exit 0 whether CI results are not completed or not success'
     required: false
     default: 'false'
   ignore-check-suite-ids:
