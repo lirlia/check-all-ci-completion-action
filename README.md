@@ -28,6 +28,10 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
     # commit hash to get check suites
     commit-hash: 'put any git commit hash'
 
+    # Default: false
+    # if true, use exit 0 whether CI results are not completed or not success
+    disable-errexit: 'true' or 'false'
+
     # Default: 000000000000000 (dummy value)
     # ignoring check suite ids
     ignore-check-suite-ids: '11111111,22222222'

@@ -4,6 +4,10 @@ inputs:
   commit-hash:
     description: 'git commit hash to get check suites'
     required: false
+  disable-errexit:
+    description: 'if false, use exit 0 whether CI results are not completed or not success'
+    required: false
+    default: 'false'
   ignore-check-suite-ids:
     description: 'ignore check_suite_ids'
     required: false
@@ -34,6 +38,7 @@ runs:
     - id: check-ci-statuses
       shell: bash
       env:
+        DISABLE_ERREXIT: "${{ inputs.disable-errexit }}"
         IGNORE_CHECK_SUITE_IDS: "${{ inputs.ignore-check-suite-ids }}"
         LOOP_COUNT: "${{ inputs.loop-count }}"
         SLEEP_SECONDS: "${{ inputs.sleep-seconds }}"
@@ -43,8 +48,26 @@ runs:
 
         set -x
 
+        # function
+        function prefail() { echo "$@" 1>&2; exit 1; }
+        function output() {
+          echo "::set-output name=status::$1"
+          echo "::set-output name=result::$2"
+        }
+
+        # set default output
+        output "null" "null"
+
+        # validation
+        [[ "$DISABLE_ERREXIT" =~ ^(true|false)$ ]] ||
+          prefail "disable-errexit must be set true or false  (use: ${DISABLE_ERREXIT}) "
+
         # use specific commit hash
         [[ $SPECIFIC_COMMIT_HASH ]] || SPECIFIC_COMMIT_HASH="$GITHUB_SHA"
+
+        # define error exit code if fail
+        ERREXIT_CODE=1
+        [[ $DISABLE_ERREXIT == "true" ]] && ERREXIT_CODE=0
 
         # get this job's check suite id, because of ignore this job
         echo "${{ github.token }}" | gh auth login --with-token
@@ -69,7 +92,7 @@ runs:
 
             # if all statuses are completed, break
             [ "${STATUS}" = "completed" ] && break
-            [[ $(( LOOP_COUNT-- )) -eq 0 ]] && exit 1
+            [[ $(( LOOP_COUNT-- )) -eq 0 ]] && output "in-progress" "null" && exit $ERREXIT_CODE
             sleep $SLEEP_SECONDS
         done
 
@@ -89,7 +112,6 @@ runs:
 
         # output
         [[ "${STATUS}" = "completed" ]] || STATUS="in-progress"
-        echo "::set-output name=status::${STATUS}"
-        echo "::set-output name=result::${RESULT}"
+        output "${STATUS}" "${RESULT}"
 
-        [[ "${RESULT}" = "success" ]] && exit 0 || exit 1
+        [[ "${RESULT}" = "success" ]] && exit 0 || exit $ERREXIT_CODE

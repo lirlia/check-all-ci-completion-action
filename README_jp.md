@@ -27,6 +27,10 @@ Check All CI Completion では、すべての起動した CI が成功してい�
     # check suites を取得するためのコミットハッシュ
     commit-hash: 'put any git commit hash'
 
+    # Default: false
+    # true の場合、ジョブに失敗しても exit 0 で正常終了します
+    disable-errexit: 'true' or 'false'
+
     # Default: 000000000000000 (dummy value)
     # 無視する check suite id を指定(複数の場合は,で区切る)
     ignore-check-suite-ids: '11111111,22222222'
