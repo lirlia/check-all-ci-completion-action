@@ -48,15 +48,15 @@ runs:
 
         set -x
 
-        # set default output
-        output "null" "null"
-
         # function
         function prefail() { echo "$@" 1>&2; exit 1; }
         function output() {
           echo "::set-output name=status::$1"
           echo "::set-output name=result::$2"
         }
+
+        # set default output
+        output "null" "null"
 
         # validation
         [[ "$DISABLE_ERREXIT" =~ ^(true|false)$ ]] ||
