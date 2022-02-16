@@ -49,11 +49,14 @@ runs:
         set -x
 
         # set default output
-        echo "::set-output name=status::no-set"
-        echo "::set-output name=result::no-set"
+        output "null" "null"
 
         # function
         function prefail() { echo "$@" 1>&2; exit 1; }
+        function output() {
+          echo "::set-output name=status::$1"
+          echo "::set-output name=result::$2"
+        }
 
         # validation
         [[ "$DISABLE_ERREXIT" =~ ^(true|false)$ ]] ||
@@ -89,7 +92,7 @@ runs:
 
             # if all statuses are completed, break
             [ "${STATUS}" = "completed" ] && break
-            [[ $(( LOOP_COUNT-- )) -eq 0 ]] && exit $ERREXIT_CODE
+            [[ $(( LOOP_COUNT-- )) -eq 0 ]] && output "in-progress" "null" && exit $ERREXIT_CODE
             sleep $SLEEP_SECONDS
         done
 
@@ -109,7 +112,6 @@ runs:
 
         # output
         [[ "${STATUS}" = "completed" ]] || STATUS="in-progress"
-        echo "::set-output name=status::${STATUS}"
-        echo "::set-output name=result::${RESULT}"
+        output "${STATUS}" "${RESULT}"
 
         [[ "${RESULT}" = "success" ]] && exit 0 || exit $ERREXIT_CODE
