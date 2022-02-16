@@ -56,7 +56,7 @@ runs:
         function prefail() { echo "$@" 1>&2; exit 1; }
 
         # validation
-        [[ "$DISABLE_ERREXIT" =~ ^(true|false)$ ]] &&
+        [[ "$DISABLE_ERREXIT" =~ ^(true|false)$ ]] ||
           prefail "disable-errexit must be set true or false  (use: ${DISABLE_ERREXIT}) "
 
         # use specific commit hash
