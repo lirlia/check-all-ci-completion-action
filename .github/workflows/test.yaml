@@ -1,0 +1,110 @@
+name: test
+on:
+  push:
+    # https://stackoverflow.com/questions/57699839/github-actions-how-to-target-all-branches-except-master
+    branches:
+      - '**'        # matches every branch
+      - '!main'     # excludes main
+
+env:
+  # https://github.com/LouisBrunner/checks-action/releases/tag/v1.2.0
+  CHECK_ACTION_HASH: 3d24d4813a797720cc4e2080a50bdafb3373aef1
+
+jobs:
+  test-args:
+    runs-on: ubuntu-20.04
+    env:
+      TEST_JOB_NAME: test-args-dummy-job
+    steps:
+      - id: check args are fine without (timeout-seconds and ignore-check-suite-ids)
+        uses: lirlia/check-all-ci-completion-action@${{ github.sha }}
+        with:
+          commit-hash: ${{ github.sha }}
+          disable-errexit: true
+          loop-count: 1
+          sleep-seconds: 1
+
+      - id: check args are fine with (timeout-seconds)
+        uses: lirlia/check-all-ci-completion-action@${{ github.sha }}
+        with:
+          disable-errexit: true
+          timeout-seconds: 5
+
+      # generate dummy queued job
+      - id: generate-queued-dummy-job
+        uses: LouisBrunner/checks-action@${{ env.CHECK_ACTION_HASH }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ env.TEST_JOB_NAME }}
+          status: queued
+
+      - id: check args are fine with (ignore-check-suite-ids)
+        uses: lirlia/check-all-ci-completion-action@${{ github.sha }}
+        with:
+          disable-errexit: true
+          ignore-check-suite-ids: ${{ steps.generate-dummy-result-job.outputs.check_id }}
+
+      # update dummy job status to success
+      - id: update-dummy-job
+        uses: LouisBrunner/checks-action@${{ env.CHECK_ACTION_HASH }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ env.TEST_JOB_NAME }}
+          check_id: ${{ steps.generate-dummy-result-job.outputs.check_id }}
+          status: completed
+          conclusion: success
+
+  test-outputs:
+    runs-on: ubuntu-20.04
+    env:
+      TEST_JOB_NAME: test-outputs-dummy-job
+    steps:
+      # generate dummy queued job
+      - id: generate-queued-dummy-job
+        uses: LouisBrunner/checks-action@${{ env.CHECK_ACTION_HASH }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ env.TEST_JOB_NAME }}
+          status: queued
+
+      - id: get-return-status-with-in-progress
+        uses: lirlia/check-all-ci-completion-action@${{ github.sha }}
+        with:
+          disable-errexit: true
+          loop-count: 1
+          sleep-seconds: 1
+
+      - id: check-return-status-is-in-progress
+        run: |
+          [[ ${{ steps.get-return-status-with-in-progress.outputs.result }} == "null" ]] || exit 1
+          [[ ${{ steps.get-return-status-with-in-progress.outputs.status }} == "in-progress" ]] || exit 1
+
+      # update dummy job status to failure
+      - id: update-dummy-job-to-fail
+        uses: LouisBrunner/checks-action@${{ env.CHECK_ACTION_HASH }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ env.TEST_JOB_NAME }}
+          check_id: ${{ steps.generate-dummy-result-job.outputs.check_id }}
+          status: completed
+          conclusion: failure
+
+      - id: check-return-status-is-fail
+        run: |
+          [[ ${{ steps.get-return-status-with-in-progress.outputs.result }} == "fail" ]] || exit 1
+          [[ ${{ steps.get-return-status-with-in-progress.outputs.status }} == "completed" ]] || exit 1
+
+      # update dummy job status to success
+      - id: update-dummy-job-to-success
+        uses: LouisBrunner/checks-action@${{ env.CHECK_ACTION_HASH }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ env.TEST_JOB_NAME }}
+          check_id: ${{ steps.generate-dummy-result-job.outputs.check_id }}
+          status: completed
+          conclusion: success
+
+      - id: check-return-status-is-success
+        run: |
+          [[ ${{ steps.get-return-status-with-in-progress.outputs.result }} == "success" ]] || exit 1
+          [[ ${{ steps.get-return-status-with-in-progress.outputs.status }} == "completed" ]] || exit 1
