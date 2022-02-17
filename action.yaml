@@ -26,7 +26,7 @@ inputs:
     default: '30'
 outputs:
   result:
-    description: 'the RESULT of the specific check-suites (success or fail)'
+    description: 'the RESULT of the specific check-suites (success or failure)'
     value: ${{ steps.check-ci-statuses.outputs.result }}
   status:
     description: 'the STATUS of the specific check-suites (completed or in-progress)'
@@ -108,7 +108,7 @@ runs:
                 | .conclusion" \
             | sort \
             | uniq \
-            | grep -v -E "(success|neutral)" && RESULT="fail" || RESULT="success"
+            | grep -v -E "(success|neutral)" && RESULT="failure" || RESULT="success"
 
         # output
         [[ "${STATUS}" = "completed" ]] || STATUS="in-progress"

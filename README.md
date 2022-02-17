@@ -53,7 +53,7 @@ Check All CI Completion checks if all launched CIs are successful or not. This m
 
 | name   | value                           | description                                                                  |
 | ------ | ------------------------------- | ---------------------------------------------------------------------------- |
-| result | null / success / fail           | another CI job result(if all jobs are success or neutral, result is success) |
+| result | null / success / failure        | another CI job result(if all jobs are success or neutral, result is success) |
 | status | null / completed / in-progress  | another CI job status                                                        |
 
 ### Full yaml (for main branch)
