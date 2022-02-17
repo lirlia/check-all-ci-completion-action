@@ -52,7 +52,7 @@ Check All CI Completion では、すべての起動した CI が成功してい�
 
 | name   | value                           | description                                                                              |
 | ------ | ------------------------------- | ---------------------------------------------------------------------------------------- |
-| result | null / success / fail           | 別の CI ジョブの結果（すべてのジョブが success または neutralの場合、結果は success です |
+| result | null / success / failure        | 別の CI ジョブの結果（すべてのジョブが success または neutralの場合、結果は success です |
 | status | null / completed / in-progress  | 別の CI ジョブのステータスです                                                           |
 
 ### Full yaml (for main branch)
