@@ -77,6 +77,22 @@ runs:
         # loop until ci which be related to commit completed by check check-suites status
         while [ $SECONDS -lt $TIMEOUT_SECONDS ]
         do
+            # get all ci check-suites count
+            # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
+            QUERY_RESULT=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${SPECIFIC_COMMIT_HASH}/check-suites" \
+                | jq -r ".check_suites[] \
+                | select(any(.app;.slug != \"codecov\")) \
+                | select(any(.app;.slug != \"dependabot\")) \
+                | select(any(.app;.slug != \"renovate\")) \
+                | select(.id != ${CHECK_SUITE_ID}) \
+                | select([.id] | inside([${IGNORE_CHECK_SUITE_IDS}]) | not )")
+
+            # if QUERY_RESULT is blank, treat all ci is succeeded
+            if [[ $QUERY_RESULT = "" ]]; then
+               output "completed" "success"
+               exit 0
+            fi
+
             # get all ci check-suites status
             # https://docs.github.com/ja/rest/reference/checks#get-a-check-suite
             STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${SPECIFIC_COMMIT_HASH}/check-suites" \
