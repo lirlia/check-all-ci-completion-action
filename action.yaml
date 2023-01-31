@@ -51,8 +51,8 @@ runs:
         # function
         function prefail() { echo "$@" 1>&2; exit 1; }
         function output() {
-          echo "::set-output name=status::$1"
-          echo "::set-output name=result::$2"
+          echo "{status}={$1}" >> $GITHUB_OUTPUT
+          echo "{result}={$2}" >> $GITHUB_OUTPUT
         }
 
         # set default output
