@@ -1,35 +1,35 @@
-name: 'Check All CI Completion'
-description: 'wether all ci status which be related to commit are success or not'
+name: "Check All CI Completion"
+description: "wether all ci status which be related to commit are success or not"
 inputs:
   commit-hash:
-    description: 'git commit hash to get check suites'
+    description: "git commit hash to get check suites"
     required: false
   disable-errexit:
-    description: 'if true, use exit 0 whether CI results are not completed or not success'
+    description: "if true, use exit 0 whether CI results are not completed or not success"
     required: false
-    default: 'false'
+    default: "false"
   ignore-check-suite-ids:
-    description: 'ignore check_suite_ids'
+    description: "ignore check_suite_ids"
     required: false
-    default: '000000000000000'
+    default: "000000000000000"
   loop-count:
-    description: 'How many loop in this ci'
+    description: "How many loop in this ci"
     required: false
-    default: '-1'
+    default: "-1"
   timeout-seconds:
-    description: 'How long run this ci'
+    description: "How long run this ci"
     required: false
-    default: '1800'
+    default: "1800"
   sleep-seconds:
-    description: 'Sleep seconds in a loop'
+    description: "Sleep seconds in a loop"
     required: false
-    default: '30'
+    default: "30"
 outputs:
   result:
-    description: 'the RESULT of the specific check-suites (success or failure)'
+    description: "the RESULT of the specific check-suites (success or failure)"
     value: ${{ steps.check-ci-statuses.outputs.result }}
   status:
-    description: 'the STATUS of the specific check-suites (completed or in-progress)'
+    description: "the STATUS of the specific check-suites (completed or in-progress)"
     value: ${{ steps.check-ci-statuses.outputs.status }}
 
 runs:
@@ -51,8 +51,8 @@ runs:
         # function
         function prefail() { echo "$@" 1>&2; exit 1; }
         function output() {
-          echo "::set-output name=status::$1"
-          echo "::set-output name=result::$2"
+          echo "{status}={$1}" >> $GITHUB_OUTPUT
+          echo "{result}={$2}" >> $GITHUB_OUTPUT
         }
 
         # set default output
