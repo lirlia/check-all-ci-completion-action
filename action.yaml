@@ -112,7 +112,7 @@ runs:
             sleep $SLEEP_SECONDS
         done
 
-        # if all check-suites results are success or neutral, this ci is success
+        # if all check-suites results are success or neutral or skipped, this ci is success
         # https://docs.github.com/ja/rest/guides/getting-started-with-the-checks-api#about-check-suites
         gh api "repos/${GITHUB_REPOSITORY}/commits/${SPECIFIC_COMMIT_HASH}/check-suites" \
             | jq -r ".check_suites[] \
@@ -124,7 +124,7 @@ runs:
                 | .conclusion" \
             | sort \
             | uniq \
-            | grep -v -E "(success|neutral)" && RESULT="failure" || RESULT="success"
+            | grep -v -E "(success|neutral|skipped)" && RESULT="failure" || RESULT="success"
 
         # output
         [[ "${STATUS}" = "completed" ]] || STATUS="in-progress"
